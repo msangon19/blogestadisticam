@@ -1,0 +1,150 @@
+---
+title: "Estadística Descriptiva con R"
+author: "Míriam Sánchez González"
+date: "2026-06-03"
+image: postsestadistica-descriptivaplot1.png
+---
+
+## 📊 Introducción a la Estadística Descriptiva
+
+En nuestro día a día con las empresas, las finanzas o cualquier entorno de investigación, nos enfrentamos a enormes cantidades de datos en bruto. Por sí solos, un montón de números en una hoja de cálculo no nos dicen nada.
+
+Aquí es donde entra la **Estadística Descriptiva**. Su objetivo principal es **transformar esos datos brutos en información útil, organizada y fácil de entender**. En lugar de mirar una lista interminable de registros, la descriptiva nos permite resumir las características clave de un conjunto de datos mediante **tablas, gráficos y medidas numéricas**.
+
+Para este viaje por el blog, vamos a utilizar un conjunto de datos clásico de R llamado `trees` 03 Crear mi primer blog con Quarto.pdf\]. Contiene información real sobre 31 árboles de cerezo negro, midiendo tres variables numéricas continuas: su **diámetro** (*Girth*), su **altura** (*Height*) y su **volumen** de madera (*Volume*).
+
+------------------------------------------------------------------------
+
+### 1. Medidas de Centralización (¿Dónde se agrupan los datos?)
+
+Buscan un valor único que represente el "centro" de toda la distribución:
+
+\* **Media (**$\bar{x}$): Es el promedio de toda la vida. Se suman todos los valores y se divide entre el número total de datos ($n$). Es muy útil, pero "sufre" mucho si hay valores extremos (valores muy grandes o muy pequeños que distorsionan el promedio).
+
+\$\$\\bar{x} = \\frac{\\sum\_{i=1}\^{n} x_i}{n}\$\$
+
+```         
+```
+
+Para calcular la media del diámetro:
+
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+
+# Cargamos el dataset
+data(trees)
+
+# Calculamos la media del diámetro (Girth)
+media_diametro <- mean(trees$Girth)
+
+# Imprimimos el resultado
+cat("La media del diámetro (Girth) es:", round(media_diametro, 2), "pulgadas.")
+
+
+```
+
+\* **Mediana (**$Me$): Es el valor que corta los datos exactamente por la mitad. Si ordenamos los árboles de menor a mayor altura, la mediana es el que se queda en el centro. Lo bueno de la mediana es que es "robusta" y no le afectan los valores extremos.
+
+\$\$\\tilde{x} = \\left\\{ \\begin{array}{ll} x\_{(n+1)/2} & \\text{si } n \\text{ es impar} \\\\ \\frac{x\_{n/2} + x\_{n/2+1}}{2} & \\text{si } n \\text{ es par} \\end{array} \\right.\$\$
+
+En esta ocasión, vamos a calcular la mediana de la altura.
+
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+
+# Cargamos el dataset
+data(trees)
+
+# Calculamos la mediana de la altura (Heigt)
+mediana_altura <- median(trees$Height)
+
+# Imprimimos el resultado
+cat("La mediana de la altura (Height) es:", round(mediana_altura, 2), "pulgadas.")
+
+
+```
+
+### 2. Medidas de Dispersión (¿Están los datos juntos o muy separados?)
+
+Dos grupos de datos pueden tener la misma media pero ser totalmente distintos. Por eso necesitamos saber cuánto se alejan los datos de ese centro:
+
+\* **Desviación Típica o Estándar (**$s$): Nos dice, de media, cuánto se desvían los datos respecto a su promedio. Si la desviación es pequeña, los árboles miden casi lo mismo; si es grande, hay mucha variedad de tamaños.
+
+\$\$s = \\sqrt{\\frac{\\sum\_{i=1}\^{n}(x_i - \\bar{x})\^2}{n-1}}\$\$
+
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+
+# Cargamos el dataset
+data(trees)
+
+# Calculamos la desviación típica de la Altura (Height)
+sd_height <- sd(trees$Height)
+
+# Imprimimos el resultado
+cat("La desviación típica de la Altura (Height) es:", round(sd_height, 2), "pies.")
+```
+
+### 3. Medidas de Posición (Los Cuartiles)
+
+**Cuartiles (**$Q_1, Q_2, Q_3$): Dividen la muestra ordenada en cuatro partes iguales (de 25% en 25%).\
+Para cada Qk (donde k=1, 2, 3):
+
+\$\$P_k = \\frac{k \\cdot (n+1)}{4}\$\$
+
+-   Primer Cuartil ($Q_1$) deja por debajo al 25% de los datos.
+
+-   Segundo Cuartil ($Q_2$) coincide con la mediana (50%)
+
+-   Tercer Cuartil ($Q_3$) deja por debajo al 75%.
+
+    Cálculo de los cuartiles:
+
+    ```{r}
+    #| echo: true
+    #| warning: false
+    #| message: false
+
+    # Cargar el dataset
+    data(trees)
+
+    # Cálculo específico de los cuartiles
+    cuartiles_h <- quantile(trees$Height, probs = c(0.25, 0.50, 0.75))
+    q1 <- cuartiles_h["25%"]
+    q2 <- cuartiles_h["50%"]
+    q3 <- cuartiles_h["75%"]
+
+
+    ```
+```{r}
+```{r}
+#| output: asis
+
+# Mostrar resultados
+cat("• Q<sub>1</sub>: ", q1, " pies.<br>\n")
+cat("• Q<sub>2</sub>/Mediana: ", q2, " pies. Como podemos comprobar coincide con la mediana.<br>\n")
+cat("• Q<sub>3</sub>: ", q3, " pies.<br>\n")
+```
+
+------------------------------------------------------------------------
+
+## 📈 Visualización Gráfica de los Datos
+
+A continuación, vemos el impacto real de estas medidas aplicadas sobre nuestros datos de los árboles.
+
+```{r}
+#| echo: true
+par(mfrow = c(1, 2))
+hist(trees$Height, main = "Histograma de Altura", xlab = "Altura", col = "plum", border = "white")
+boxplot(trees$Height, main = "Boxplot de Altura", ylab = "Altura", col = "plum")
+```
+
+-   **Histograma:** Nos permite observar la **distribución de la frecuencia**. Las barras nos muestran cómo se agrupan las alturas de los árboles; si son más altas o bajas en ciertas zonas, nos da una idea rápida de si la mayoría de los árboles tienen una altura similar o si hay mucha variedad.
+
+-   **Caja de Bigotes (Boxplot):** Es ideal para detectar la **variabilidad y valores atípicos**. La caja central representa el rango intercuartílico (donde se concentra el 50% central de los datos), la línea gruesa interior es la mediana y los "bigotes" nos marcan el rango de los datos típicos. Si ves puntos aislados fuera de los bigotes, serían árboles con alturas inusualmente extremas.

@@ -1,0 +1,105 @@
+---
+title: "Inferencia estadística"
+date: "2026-06-02"
+image: postsinferencia-estadisticaplot2.png
+---
+
+## 🥣 ¿Qué es esto de la Inferencia?
+
+Imagínate que vas a cocinar una olla gigante de sopa. Quieres saber si está bien de sal, pero **no te vas a comer la olla entera** (eso sería tu población). Así que coges una cuchara, pruebas un poquito (la muestra) y, basándote en eso, decides: "le falta sal" o "está perfecta".
+
+Eso es la **Inferencia Estadística**: intentar adivinar cómo está toda la olla (la población) probando solo una cucharadita (la muestra) sin morir en el intento.
+
+## 📝 Conceptos Básicos
+
+-   **Estimación Puntual:** Intentar adivinar el parámetro poblacional $\theta$ con un solo número (estadístico).
+
+-   **Estimador (**$\hat{\theta}$**)**: La herramienta matemática que usamos para calcular esa aproximación.
+
+-   **Máxima Verosimilitud:** Elegir el parámetro que hace que los datos que hemos observado sean lo más probables posible.
+
+-   **Intervalo de Confianza:** Un rango $[a, b]$ donde confiamos que vive el valor real, con una probabilidad de fallo controlada por $\alpha$.
+
+-   **Contraste de Hipótesis:** El "juicio" donde ponemos a prueba una afirmación $H_0$ frente a una alternativa $H_1$.
+
+-   **Distribución Normal:** El pilar de la inferencia. Si estimamos la media $\mu$, usamos la media muestral $\bar{X}$, que sigue: $\bar{X} \sim N(\mu, \frac{\sigma^2}{n})$.
+
+-   **Errores de contraste:**
+
+    -   **Error Tipo I (**$\alpha$**):** Rechazar $H_0$ cuando es verdadera (falso positivo).
+
+    -   **Error Tipo II (**$\beta$**):** No rechazar $H_0$ cuando es falsa (falso negativo).
+
+## 🌳 Análisis práctico: Dataset `trees`
+
+Siguiendo con nuestros amigos los árboles, vamos a aplicar esto. Queremos estimar la altura media (`Height`) de todos los cerezos negros.
+
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+
+# Cargamos los datos
+data(trees)
+
+# Calculamos la media muestral
+media_muestral <- mean(trees$Height)
+
+# Calculamos el Intervalo de Confianza al 95%
+test_res <- t.test(trees$Height, conf.level = 0.95)
+
+# Mostramos los resultados
+cat("Estimación puntual (Media):", round(media_muestral, 2), "pies.\n")
+cat("Intervalo de confianza al 95%:", 
+    round(test_res$conf.int[1], 2), "a", 
+    round(test_res$conf.int[2], 2), "pies.")
+```
+
+Para visualizar el histograma de la altura de los árboles objeto de estudio y representar que la media es de 76 pies usamos el siguiente código:
+
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+data(trees)
+
+# 1. Visualización de la distribución de la media
+hist(trees$Height, main="Distribución de Alturas", xlab="Pies", col="skyblue", border="white")
+abline(v=mean(trees$Height), col="red", lwd=3) # Nuestra media muestral
+
+```
+
+Contraste de hipótesis:
+
+Definimos nuestro contraste para verificar si la altura media poblacional ($\mu$) es igual a 76 pies:
+
+-   $H_0$**:** \$$\mu = 76$
+
+-   $H_1$**:** $\mu \neq 76$
+
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+test_h <- t.test(trees$Height, mu = 76)
+```
+
+### ¿Qué nos dice esto?
+
+1.  **Sobre la distribución:** El histograma nos muestra una distribución centrada cerca de los 76 pies. Nuestra media muestral (línea roja) cae muy cerca de los 76 pies que hipotetizamos.
+
+2.  **Sobre el contraste:** El $p$-valor `r round(test_h$p.value, 4)` es mayor que 0.05. **Interpretación:** No rechazamos la Hipótesis Nula ($H_0: \mu = 76$). Los datos son compatibles con la idea de que la altura media sea de 76 pies.
+
+### Interpretación de resultados y Errores
+
+-   **¿Cómo entender los errores aquí?**
+
+    -   Si nuestro $p$-valor es bajo ($p< 0.05$), rechazamos $H_0$. Si por azar la media fuera 76 y aún así la rechazamos, habríamos cometido un **Error Tipo I**.
+
+    -   Si la media real fuera, por ejemplo, 80 pies y nuestro test no logra rechazar $H_0=76$, habríamos caído en un **Error Tipo II** (no detectar que el árbol es realmente más alto).
+
+    -   **Sobre los errores:** - Como no rechazamos la hipótesis, no podemos cometer un **Error Tipo I** (porque no estamos rechazando $H_0$).
+
+        -   Sin embargo, existe la posibilidad de estar cometiendo un **Error Tipo II**: es decir, que la media verdadera sea, por ejemplo, 75 o 77, y nuestro test simplemente no ha tenido "potencia" suficiente para detectar esa pequeña diferencia con esta muestra de 31 árboles.
+
+¡Ya estamos haciendo inferencia!
