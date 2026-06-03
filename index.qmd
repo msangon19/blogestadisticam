@@ -1,12 +1,70 @@
 ---
-title: "Blog estadística Míriam"
-listing:
-  contents: posts
-  sort: "date desc"
-  type: default
-  categories: true
-  sort-ui: false
-  filter-ui: false
-page-layout: full
-title-block-banner: true
+title: "Regresión lineal"
+date: "2026-06-01"
+image: Regresión lineal.png
 ---
+
+## 🔮 El oráculo
+
+Si la inferencia era probar la sopa, la **regresión lineal** es nuestro intento de ser adivinos. Imagina que quieres saber cuánto mide un árbol sin tener que treparlo, solo mirando cuánto mide su tronco. Básicamente, le decimos al ordenador: "Oye, aquí tienes unos datos, ¡encuéntrame la línea que mejor une estos puntos!". Es como intentar unir los puntos de un dibujo infantil, pero con matemáticas serias.
+
+## 📝 Marco Teórico
+
+-   **El Modelo:** $$Y = \beta_0 + \beta_1 X + \varepsilon$$. Intentamos explicar una variable dependiente (\$Y\$) mediante una independiente (\$X\$).
+
+-   **Mínimos Cuadrados (MCO):** Buscamos minimizar la suma de los cuadrados de los errores: $$\sum (Y_i - \hat{Y}_i)^2$$.
+
+-   **Interpretación:** $\beta_1$ nos dice cuánto cambia $Y$ por cada unidad que aumenta $X$.
+
+-   **Supuestos:** Linealidad, homocedasticidad (varianza constante), independencia y normalidad de los residuos.
+
+-   **Inferencia:** Construimos intervalos de confianza para los coeficientes y contrastes de significación ($t$-test) para ver si $\beta_1 \neq 0$.
+
+## 🌳 Análisis práctico: Dataset `trees`
+
+Queremos predecir el volumen de madera (`Volume`) a partir de la altura (`Height`).
+
+```         
+ 
+```
+
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+data(trees)
+
+# Ajuste del modelo
+modelo <- lm(Volume ~ Height, data = trees)
+
+# Resumen del modelo
+summary(modelo)
+
+```
+
+### Interpretación de Resultados
+
+1.  **Estimación:** Nuestro modelo es $$\widehat{Volume} = -87.12 + 1.54 \cdot Height$$.
+
+    -   Por cada pie que aumenta la altura, el volumen aumenta de media 1.54 unidades.
+
+2.  **Contraste de significación:** El $p$-valor asociado a `Height` es `r round(summary(modelo)$coefficients[2,4], 4)`. Como es menor a 0.05, el efecto de la altura sobre el volumen es **estadísticamente significativo**.
+
+3.  **Intervalo de Confianza:**
+
+    ```{r}
+    ### Diagnóstico del Modelo
+    #| echo: true
+    #| warning: false
+    confint(modelo, "Height", level = 0.95)
+    # Para comprobar los supuestos, veamos cómo se ajusta:
+    plot(modelo, which = 1) # Gráfico de residuos vs ajustados
+
+
+    ```
+
+Como no conocemos la población completa, el intervalo nos da el margen de error. Podemos decir con un **95% de confianza** que el efecto real de la altura sobre el volumen está entre **0.76 y 2.33** unidades por pie.
+
+Si los puntos están repartidos al azar sin formar patrones claros (como una "nube" sin forma), ¡nuestros supuestos de homocedasticidad e independencia se cumplen!
+
+¡Ahora sí que hemos cerrado el círculo: de la muestra a la predicción!
